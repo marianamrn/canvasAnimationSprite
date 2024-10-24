@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Animation sorites cherepashku</title>
+        <style>
+            #canvas {
+                background-color: #B1D3FF;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas" width="1500" height="832"></canvas>
+
+        <script>
+            const FRAME_RATE = 12; //частота кадрів
+            const ANIMATION_DELAY = 1000 / FRAME_RATE; //затримка між кадрами
+            const TOTAL_FRAMES = 8; //кількість кадрів у анімації
+            const SPRITE_WIDTH = 200;
+            const SPRITE_SPEED = 5;
+
+            let currentFrame = 1;
+            let lastUpdateTime = 0;
+            let spriteX = 0;
+            let direction = 1; //вправо
+
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const frameImage = new Image();
+
+            frameImage.onload = () => {
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                
+                //Віддзеркалити зображення якщо рух вліво
+                if(direction === -1) {
+                    ctx.save();
+                    ctx.scale(-1,1);
+                    ctx.drawImage(frameImage, -spriteX - SPRITE_WIDTH, canvas.height / 2 - SPRITE_WIDTH / 2, SPRITE_WIDTH, SPRITE_WIDTH);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(frameImage, spriteX, canvas.height / 2 - SPRITE_WIDTH / 2, SPRITE_WIDTH, SPRITE_WIDTH);
+                }
+            };
+
+            function updateAnimation(time) {
+                if(time - lastUpdateTime > ANIMATION_DELAY) {
+                    if(currentFrame > TOTAL_FRAMES) {
+                        currentFrame = 1;
+                    }
+
+                    frameImage.src = `frame${currentFrame++}.png`;
+                    spriteX += SPRITE_SPEED * direction;
+                    if(spriteX + SPRITE_WIDTH >= canvas.width || spriteX <=0){
+                        direction *= -1;
+                    }
+
+                    lastUpdateTime = time;
+                }
+                requestAnimationFrame(updateAnimation);
+            }
+            requestAnimationFrame(updateAnimation);
+        </script>
+    </body>
+</html>
